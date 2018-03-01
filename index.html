@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Food for Thought</title>
+  <link href="styles.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash" rel="stylesheet">
+</head>
+
+<body id="background">
+  <div id="app">
+    <!--
+    <center>
+      <div id="top">
+
+        <img src="food_picture.JPG" id="foodPicture"/>
+
+    </div>
+    </center>
+  -->
+    <div id="main">
+
+    <center>
+
+      <h1>Food for Thought</h1>
+      <p>We might have access to hundreds upon thousands of recipes today because of our friend google, but sometimes too much information is worse than no information at all. Use our database to not only search for recipes, but also sort those recipes to always get the best of the best for your health.</p>
+    </center>
+
+
+    <br>
+
+    <div class="container">
+      <form class="col">
+        <center>
+        <b><h3>Diet:</h3></b>
+      </center>
+
+        <ul>
+          <li>
+            <input v-model="dietRadio" type="radio" id="balanced" value="balanced" checked>
+            <label for="balanced" title="Protein/Fat/Carb values in 15/35/50 ratio">Balanced</label>
+            <div class="check"></div>
+          </li>
+          <li>
+            <input v-model="dietRadio" type="radio" id="high-protein" value="high-protein">
+            <label for="high-protein" title="More than 50% of total calories from proteins">High-protein</label>
+            <div class="check"></div>
+          </li>
+          <li>
+            <input v-model="dietRadio" type="radio" id="low-fat" value="low-fat">
+            <label for="low-fat" title="Less than 15% of total calories from fat">Low-fat</label>
+            <div class="check"></div>
+          </li>
+          <li>
+            <input v-model="dietRadio" type="radio" id="low-carb" value="low-carb">
+            <label for="low-carb" title="Less than 20% of total calories from carbs">Low-carb</label>
+            <div class="check"></div>
+          </li>
+          <li>
+            <input v-model="dietRadio" type="radio" id="noneDiet" value="">
+            <label for="noneDiet">None</label>
+            <div class="check"></div>
+          </li>
+      </ul>
+      </form>
+
+
+      <form class="col">
+        <center>
+        <b><h3>Health:</h3></b>
+      </center>
+        <ul>
+          <li>
+            <input v-model="healthRadio" type="radio" id="alcohol-free" value="alcohol-free" checked>
+            <label for="alcohol-free" title="No alcohol used or contained">Alcohol-free</label>
+            <div class="check"></div>
+          </li>
+          <li>
+            <input v-model="healthRadio" type="radio" id="peanut-free" value="peanut-free">
+            <label for="peanut-free" title="No peanuts or products containing peanuts">Peanut-free</label>
+            <div class="check"></div>
+          </li>
+          <li>
+            <input v-model="healthRadio" type="radio" id="sugar-conscious" value="sugar-conscious">
+            <label for="sugar-conscious" title="Less than 4g of sugar per serving">Sugar-conscious</label>
+            <div class="check"></div>
+          </li>
+          <li>
+            <input v-model="healthRadio" type="radio" id="vegan" value="vegan">
+            <label for="vegan" title="No meat, poultry, fish, dairy, eggs or honey">Vegan</label>
+            <div class="check"></div>
+          </li>
+          <li>
+            <input v-model="healthRadio" type="radio" id="noneHealth" value="">
+            <label for="noneHealth">None</label>
+            <div class="check"></div>
+          </li>
+        </ul>
+
+      </form>
+    </div>
+
+      <br>
+      <br>
+
+      <center>
+
+        <form v-on:submit.prevent="submit" id="submitArea">
+          <b><label>Search for Recipes</label></b>
+          <input v-model="value" id="foodInput" type="text"></input>
+          <br>
+          <br>
+          <button v-on:click="submitSearch" class="coolButton">Submit</button>
+          <!-- <input id="foodSubmit" type="submit" value="Submit" class="coolButton"></input> -->
+        </form>
+
+      </center>
+
+      <br>
+
+
+    <center>
+      <div id="foodDisplay">
+      </div>
+    </center>
+
+
+
+    <center>
+      <button v-if="showPrev" v-on:click="choosePrev" v-on:submit.prevent="prev" type="button" id="PrevButton" class="coolButton">Previous</button>
+      <button v-if="showNext" v-on:click="chooseNext" v-on:submit.prevent="next" type="button" id="NextButton" class="coolButton">Next</button>
+    </center>
+
+    <br>
+
+    <footer>
+      <center><a href="https://github.com/edenknudson/creativeProject3">Visit my Github</a></center>
+    </footer>
+    </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-star-rating/dist/star-rating.min.js"></script>
+
+    <script src="script.js" text="type/javascript"></script>
+
+
+
+
+</body>
+
+
+</html>
