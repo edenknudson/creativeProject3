@@ -13,8 +13,6 @@ var app = new Vue({
     value: "",
     first: 0,
     last: 10,
-    showNext: false,
-    showPrev: false,
     results: {},
     count: 0,
     submit:true,
@@ -40,7 +38,6 @@ var app = new Vue({
           searchAll(app.value, app.dietRadio, app.healthRadio, app.first, app.last);
 
         }
-        this.showPrev = true;
       }else{
         alert("Input a search word");
       }
@@ -50,10 +47,6 @@ var app = new Vue({
       if(this.first != 0){
         this.first = this.first - 10;
         this.last = this.last - 10;
-
-        if(this.first == 0){
-          this.showPrev = false;
-        }
 
         if(app.value !== ""){
           if(app.healthRadio == "" && app.dietRadio == ""){
@@ -89,7 +82,6 @@ var app = new Vue({
           searchAll(app.value, app.dietRadio, app.healthRadio, app.first, app.last);
 
         }
-        this.showNext = true;
       }else{
         alert("Input a search word");
       }
@@ -97,6 +89,9 @@ var app = new Vue({
     publish: function(json){
       console.log(json);
       this.count = json.count;
+      if(json.count == 0){
+        alert("No Recipes Found")
+      }
       for(i=0;i<json.hits.length;i++){
         if(i == 0){
           this.source = json.hits[i].recipe.image;

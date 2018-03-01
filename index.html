@@ -160,8 +160,8 @@
 
 
     <center>
-      <button v-if="showPrev" v-on:click="choosePrev" v-on:submit.prevent="prev" type="button" id="PrevButton" class="coolButton">Previous</button>
-      <button v-if="showNext" v-on:click="chooseNext" v-on:submit.prevent="next" type="button" id="NextButton" class="coolButton">Next</button>
+      <button v-if="count > 0" v-on:click="choosePrev" v-on:submit.prevent="prev" type="button" id="PrevButton" class="coolButton">Previous</button>
+      <button v-if="count > 0" v-on:click="chooseNext" v-on:submit.prevent="next" type="button" id="NextButton" class="coolButton">Next</button>
     </center>
 
     <br>
