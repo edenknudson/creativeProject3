@@ -15,6 +15,10 @@ var app = new Vue({
     last: 10,
     showNext: false,
     showPrev: false,
+    results: {},
+    count: 0,
+    submit:true,
+    source: "",
   },
   computed:{
 
@@ -70,6 +74,8 @@ var app = new Vue({
     submitSearch: function(){
       app.first = 0;
       app.last = 10;
+      this.results = {};
+      this.count = 0;
 
       if(app.value !== ""){
 
@@ -88,10 +94,82 @@ var app = new Vue({
         alert("Input a search word");
       }
     },
+    publish: function(json){
+      console.log(json);
+      this.count = json.count;
+      for(i=0;i<json.hits.length;i++){
+        if(i == 0){
+          this.source = json.hits[i].recipe.image;
+        }
+        var number = app.first + i + 1;
+        var ingredients = {};
+        if(json.hits[i].recipe.ingredients.length == 0){
+          ingredients[0] = ({text: "None Listed"});
+        }
+        for(j=0;j<json.hits[i].recipe.ingredients.length;j++){
+          ingredients[j] = ({text: json.hits[i].recipe.ingredients[j].text});
+        }
+        var cautions = {};
+        if(json.hits[i].recipe.cautions.length == 0){
+          cautions[0] = ("None Listed");
+        }
+        for(j=0;j<json.hits[i].recipe.cautions.length;j++){
+          cautions[j] = (json.hits[i].recipe.cautions[j]);
+        }
+        this.results[i] = ({num: number, label: json.hits[i].recipe.label, image: json.hits[i].recipe.image, url: json.hits[i].recipe.url, cps: Math.round(json.hits[i].recipe.calories / json.hits[i].recipe.yield) ,calories: Math.round(json.hits[i].recipe.calories), servings: json.hits[i].recipe.yield, ingredients: ingredients, cautions: cautions});
+      }
 
+      /*
+      var results = "";
+      results += '<h2>Number of recipes: ' + json.count + "</h2>";
+
+      for(i=0;i<json.hits.length;i++){
+          var num = this.first + i + 1;
+          results += '<h3>'+ num + ". " + json.hits[i].recipe.label + '</h3>';
+          results += '<img src="' + json.hits[i].recipe.image + '"/>'
+          results += '<br>';
+          results += '<a href="' + json.hits[i].recipe.url + '"><b>Link to recipe</b></a>';
+          results += '<p><b>Calories</b>: ' + Math.round(json.hits[i].recipe.calories) + '</p>';
+          results += '<p><b>Servings</b>: ' + json.hits[i].recipe.yield + '</p>';
+          results += '<p><b>Calories per Serving</b>: ' + Math.round(json.hits[i].recipe.calories / json.hits[i].recipe.yield) + '</p>';
+
+          results += '<p><b>Ingredients</b>: ';
+          for(j=0;j<json.hits[i].recipe.ingredients.length;j++){
+            results += json.hits[i].recipe.ingredients[j].text;
+            if(j < json.hits[i].recipe.ingredients.length - 1){
+              results += ", ";
+            }
+          }
+          results += '</p>';
+          if(json.hits[i].recipe.cautions.length > 0){
+            results += '<p><b>Cautions</b>: ';
+            for(j=0;j<json.hits[i].recipe.cautions.length;j++){
+              results +=  json.hits[i].recipe.cautions[j];
+              if(j < json.hits[i].recipe.cautions.length - 1){
+                results += ", ";
+              }
+            }
+            results += '</p>';
+          }
+
+          results += '<br>';
+          if(i < json.hits.length -1 ){
+            results += '<hr>';
+            results += '<br>';
+          }else{
+            results += '<br>';
+            results += '<br>';
+            results += '<br>';
+          }
+      }
+
+      console.log(results);
+      $("#foodDisplay").html(results);
+      */
+    }
   },
-});
 
+});
 
 function searchAll(value, diet, health, first, last){
   $.ajax({
@@ -103,53 +181,7 @@ function searchAll(value, diet, health, first, last){
       //url : myurl,
       //dataType : "json",
       success : function(json) {
-          console.log(json);
-          var results = "";
-          results += '<h2>Number of recipes: ' + json.count + "</h2>";
-
-          for(i=0;i<json.hits.length;i++){
-              var num = first + i + 1;
-              results += '<h3>'+ num + ". " + json.hits[i].recipe.label + '</h3>';
-              results += '<img src="' + json.hits[i].recipe.image + '"/>'
-              results += '<br>';
-              results += '<a href="' + json.hits[i].recipe.url + '"><b>Link to recipe</b></a>';
-              results += '<p><b>Calories</b>: ' + Math.round(json.hits[i].recipe.calories) + '</p>';
-        results += '<p><b>Servings</b>: ' + json.hits[i].recipe.yield + '</p>';
-              results += '<p><b>Calories per Serving</b>: ' + Math.round(json.hits[i].recipe.calories / json.hits[i].recipe.yield) + '</p>';
-
-              results += '<p><b>Ingredients</b>: ';
-              for(j=0;j<json.hits[i].recipe.ingredients.length;j++){
-                results += json.hits[i].recipe.ingredients[j].text;
-                if(j < json.hits[i].recipe.ingredients.length - 1){
-                  results += ", ";
-                }
-              }
-              results += '</p>';
-              if(json.hits[i].recipe.cautions.length > 0){
-                results += '<p><b>Cautions</b>: ';
-                for(j=0;j<json.hits[i].recipe.cautions.length;j++){
-                  results +=  json.hits[i].recipe.cautions[j];
-                  if(j < json.hits[i].recipe.cautions.length - 1){
-                    results += ", ";
-                  }
-                }
-                results += '</p>';
-              }
-
-              results += '<br>';
-              if(i < json.hits.length -1 ){
-                results += '<hr>';
-                results += '<br>';
-              }else{
-                results += '<br>';
-                results += '<br>';
-                results += '<br>';
-              }
-          }
-
-          console.log(results);
-          $('#background').css('background', 'url(' + json.hits[0].recipe.image + ')');
-          $("#foodDisplay").html(results);
+        app.publish(json);
       }
   });
 }
@@ -158,58 +190,13 @@ function searchNone(value, first, last){
   $.ajax({
 
     type: "GET",
-    data: { q: value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", diet: diet, health: health, from: first, to: last},
+    data: { q: value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", from: first, to: last},
     dataType: 'json',
     url: "https://api.edamam.com/search",
       //url : myurl,
       //dataType : "json",
       success : function(json) {
-          console.log(json);
-          var results = "";
-          results += '<h2>Number of recipes: ' + json.count + "</h2>";
-
-          for(i=0;i<json.hits.length;i++){
-              var num = first + i + 1;
-              results += '<h3>'+ num + ". " + json.hits[i].recipe.label + '</h3>';
-              results += '<img src="' + json.hits[i].recipe.image + '"/>'
-              results += '<br>';
-              results += '<a href="' + json.hits[i].recipe.url + '"><b>Link to recipe</b></a>';
-              results += '<p><b>Calories</b>: ' + Math.round(json.hits[i].recipe.calories) + '</p>';
-        results += '<p><b>Servings</b>: ' + json.hits[i].recipe.yield + '</p>';
-              results += '<p><b>Calories per Serving</b>: ' + Math.round(json.hits[i].recipe.calories / json.hits[i].recipe.yield) + '</p>';
-
-              results += '<p><b>Ingredients</b>: ';
-              for(j=0;j<json.hits[i].recipe.ingredients.length;j++){
-                results += json.hits[i].recipe.ingredients[j].text;
-                if(j < json.hits[i].recipe.ingredients.length - 1){
-                  results += ", ";
-                }
-              }
-              results += '</p>';
-              if(json.hits[i].recipe.cautions.length > 0){
-                results += '<p><b>Cautions</b>: ';
-                for(j=0;j<json.hits[i].recipe.cautions.length;j++){
-                  results +=  json.hits[i].recipe.cautions[j];
-                  if(j < json.hits[i].recipe.cautions.length - 1){
-                    results += ", ";
-                  }
-                }
-                results += '</p>';
-              }
-
-              results += '<br>';
-              if(i < json.hits.length -1 ){
-                results += '<hr>';
-                results += '<br>';
-              }else{
-                results += '<br>';
-                results += '<br>';
-                results += '<br>';
-              }
-          }
-
-          console.log(results);
-          $("#foodDisplay").html(results);
+        app.publish(json);
       }
   });
 }
@@ -218,58 +205,13 @@ function searchDiet(value, diet, first, last){
   $.ajax({
 
     type: "GET",
-    data: { q: value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", diet: diet, health: health, from: first, to: last},
+    data: { q:value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", diet:diet, from: first, to:last},
     dataType: 'json',
     url: "https://api.edamam.com/search",
       //url : myurl,
       //dataType : "json",
       success : function(json) {
-          console.log(json);
-          var results = "";
-          results += '<h2>Number of recipes: ' + json.count + "</h2>";
-
-          for(i=0;i<json.hits.length;i++){
-              var num = first + i + 1;
-              results += '<h3>'+ num + ". " + json.hits[i].recipe.label + '</h3>';
-              results += '<img src="' + json.hits[i].recipe.image + '"/>'
-              results += '<br>';
-              results += '<a href="' + json.hits[i].recipe.url + '"><b>Link to recipe</b></a>';
-              results += '<p><b>Calories</b>: ' + Math.round(json.hits[i].recipe.calories) + '</p>';
-        results += '<p><b>Servings</b>: ' + json.hits[i].recipe.yield + '</p>';
-              results += '<p><b>Calories per Serving</b>: ' + Math.round(json.hits[i].recipe.calories / json.hits[i].recipe.yield) + '</p>';
-
-              results += '<p><b>Ingredients</b>: ';
-              for(j=0;j<json.hits[i].recipe.ingredients.length;j++){
-                results += json.hits[i].recipe.ingredients[j].text;
-                if(j < json.hits[i].recipe.ingredients.length - 1){
-                  results += ", ";
-                }
-              }
-              results += '</p>';
-              if(json.hits[i].recipe.cautions.length > 0){
-                results += '<p><b>Cautions</b>: ';
-                for(j=0;j<json.hits[i].recipe.cautions.length;j++){
-                  results +=  json.hits[i].recipe.cautions[j];
-                  if(j < json.hits[i].recipe.cautions.length - 1){
-                    results += ", ";
-                  }
-                }
-                results += '</p>';
-              }
-
-              results += '<br>';
-              if(i < json.hits.length -1 ){
-                results += '<hr>';
-                results += '<br>';
-              }else{
-                results += '<br>';
-                results += '<br>';
-                results += '<br>';
-              }
-          }
-
-          console.log(results);
-          $("#foodDisplay").html(results);
+        app.publish(json);
       }
   });
 }
@@ -278,58 +220,69 @@ function searchHealth(value, health, first, last){
   $.ajax({
 
     type: "GET",
-    data: { q: value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", diet: diet, health: health, from: first, to: last},
+    data: { q: value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", health:health, from: first, to: last},
     dataType: 'json',
     url: "https://api.edamam.com/search",
       //url : myurl,
       //dataType : "json",
       success : function(json) {
-          console.log(json);
-          var results = "";
-          results += '<h2>Number of recipes: ' + json.count + "</h2>";
-
-          for(i=0;i<json.hits.length;i++){
-              var num = first + i + 1;
-              results += '<h3>'+ num + ". " + json.hits[i].recipe.label + '</h3>';
-              results += '<img src="' + json.hits[i].recipe.image + '"/>'
-              results += '<br>';
-              results += '<a href="' + json.hits[i].recipe.url + '"><b>Link to recipe</b></a>';
-              results += '<p><b>Calories</b>: ' + Math.round(json.hits[i].recipe.calories) + '</p>';
-        results += '<p><b>Servings</b>: ' + json.hits[i].recipe.yield + '</p>';
-              results += '<p><b>Calories per Serving</b>: ' + Math.round(json.hits[i].recipe.calories / json.hits[i].recipe.yield) + '</p>';
-
-              results += '<p><b>Ingredients</b>: ';
-              for(j=0;j<json.hits[i].recipe.ingredients.length;j++){
-                results += json.hits[i].recipe.ingredients[j].text;
-                if(j < json.hits[i].recipe.ingredients.length - 1){
-                  results += ", ";
-                }
-              }
-              results += '</p>';
-              if(json.hits[i].recipe.cautions.length > 0){
-                results += '<p><b>Cautions</b>: ';
-                for(j=0;j<json.hits[i].recipe.cautions.length;j++){
-                  results +=  json.hits[i].recipe.cautions[j];
-                  if(j < json.hits[i].recipe.cautions.length - 1){
-                    results += ", ";
-                  }
-                }
-                results += '</p>';
-              }
-
-              results += '<br>';
-              if(i < json.hits.length -1 ){
-                results += '<hr>';
-                results += '<br>';
-              }else{
-                results += '<br>';
-                results += '<br>';
-                results += '<br>';
-              }
-          }
-
-          console.log(results);
-          $("#foodDisplay").html(results);
+        app.publish(json);
       }
   });
 }
+
+/*
+
+function searchAll(value, diet, health, first, last){
+
+}
+
+function searchNone(value, first, last){
+  $.ajax({
+
+    type: "GET",
+    data: { q: value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", from: first, to: last},
+    dataType: 'json',
+    url: "https://api.edamam.com/search",
+      //url : myurl,
+      //dataType : "json",
+      success : function(json) {
+        search(json);
+      }
+  });
+}
+
+function searchDiet(value, diet, first, last){
+  $.ajax({
+
+    type: "GET",
+    data: { q: value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", diet: diet, from: first, to: last},
+    dataType: 'json',
+    url: "https://api.edamam.com/search",
+      //url : myurl,
+      //dataType : "json",
+      success : function(json) {
+        search(json);
+      }
+  });
+}
+
+function searchHealth(value, health, first, last){
+  $.ajax({
+
+    type: "GET",
+    data: { q: value, app_id: "35a5939d", app_key: "351ac21caa15c6db8eb6b10cec10a3d2", health: health, from: first, to: last},
+    dataType: 'json',
+    url: "https://api.edamam.com/search",
+      //url : myurl,
+      //dataType : "json",
+      success : function(json) {
+        search(json);
+      }
+  });
+}
+
+function search(json){
+
+}
+*/

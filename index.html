@@ -8,8 +8,8 @@
   <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash" rel="stylesheet">
 </head>
 
-<body id="background">
-  <div id="app">
+<body>
+<div id="app">
     <!--
     <center>
       <div id="top">
@@ -19,7 +19,8 @@
     </div>
     </center>
   -->
-    <div id="main">
+  <div id="background" v-bind:style="{ 'background-image': 'url(' + source + ')' }">
+    <div id="main" >
 
     <center>
 
@@ -118,7 +119,38 @@
       </center>
 
       <br>
+      <center>
+      <h2 v-if="count > 0">Number of recipes: {{count}}</h2>
+      </center>
 
+      <center>
+      <div v-for="result in results">
+      	  <hr>
+
+          <h3>{{result.num}}. {{result.label}}</h3>
+          <img :src=result.image>
+          <br>
+          <a :href=result.url><b>Link to recipe</b></a>
+          <p><b>Calories</b>: {{result.calories}}</p>
+          <p><b>Servings</b>: {{result.servings}}</p>
+          <p><b>Calories per Serving</b>: {{result.cps}}</p>
+
+          <p><b>Ingredients</b>:</p>
+          <p>
+          <div v-for="ing in result.ingredients">
+            {{ing.text}}
+          </div>
+          </p>
+
+          <p><b>Cautions</b>:</p>
+          <p>
+          <div v-for="cau in result.cautions">
+            {{cau}}
+          </div>
+          </p>
+
+	    </div>
+      </center>
 
     <center>
       <div id="foodDisplay">
@@ -138,7 +170,9 @@
       <center><a href="https://github.com/edenknudson/creativeProject3">Visit my Github</a></center>
     </footer>
     </div>
+  </div>
     </div>
+</body>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
@@ -149,7 +183,7 @@
 
 
 
-</body>
+
 
 
 </html>
